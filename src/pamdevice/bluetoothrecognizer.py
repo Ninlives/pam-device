@@ -32,9 +32,9 @@ class BluetoothRecognizer(Recognizer):
     device_type = 'bluetooth'
 
     def scan(self):
-        device_re = re.compile(r"^\s+([^\s]+)\s+(.*)$", re.I)
+        device_re = re.compile(r"^Device\s+([^\s]+)\s+(.*)$", re.I)
         devices = []
-        df = execute_command('hcitool scan --flush')
+        df = execute_command('bluetoothctl devices')
         for i in df.split('\n'):
             if i:
                 info = device_re.match(i)
@@ -46,7 +46,8 @@ class BluetoothRecognizer(Recognizer):
         return devices
 
     def is_device_connected(self, item_id):
-        df = execute_command('hcitool name {}'.format(item_id))
-        if df:
+        connected_re = re.compile(r"Connected:\s+yes$", r.MULTILINE)
+        df = execute_command('bluetoothctl info {}'.format(item_id))
+        if connected_re.search(df):
             return True
         return False

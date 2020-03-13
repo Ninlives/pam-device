@@ -148,9 +148,9 @@ class ScanDevicesDialog(Gtk.Dialog):
         return self.devices_list.get_items()
 
     def scan_bluetooth(self):
-        device_re = re.compile(r"^\s+([^\s]+)\s+(.*)$", re.I)
+        device_re = re.compile(r"^Device\s+([^\s]+)\s+(.*)$", re.I)
         devices = []
-        df = execute_command('hcitool scan --flush').decode()
+        df = execute_command('bluetoothctl devices').decode()
         for i in df.split('\n'):
             if i:
                 info = device_re.match(i)

@@ -43,17 +43,6 @@ class UserUnknownException(Exception):
     pass
 
 
-def setPAMMessage(pamh, message, errorMessage=False):
-    try:
-        style = pamh.PAM_ERROR_MSG if errorMessage else pamh.PAM_TEXT_INFO
-        msg = pamh.Message(style, '* PAM device: {}'.format(message))
-        pamh.conversation(msg)
-        return True
-    except Exception as e:
-        auth_log(str(e), syslog.LOG_ERR)
-        return False
-
-
 def auth_log(message, priority=syslog.LOG_INFO):
     syslog.openlog(facility=syslog.LOG_AUTH)
     syslog.syslog(priority, 'PAM device: {}'.format(message))
@@ -73,44 +62,27 @@ def pam_sm_authenticate(pamh, flags, argv):
 
         auth_log('Authentication request for user "{}"'.format(
             userName.encode('utf-8')))
-        setPAMMessage(pamh, 'Authentication request for user "{}"'.format(
-            userName.encode('utf-8')))
 
         usbr = USBRecognizer()
         auth_log('Recognizing USB devices ...')
-        setPAMMessage(pamh, 'Recognizing USB devices ...')
         device = usbr.check()
         if device is not None:
-            auth_log('Device {} is connected (good).'.format(
-                device['id']))
             auth_log('Access granted!')
-            setPAMMessage(pamh, 'Device "{}" is connected (good).'.format(
-                device['name'].encode('utf-8')))
-            setPAMMessage(pamh, 'Access granted!')
             return pamh.PAM_SUCCESS
         auth_log('No USB devices connected!', syslog.LOG_WARNING)
-        setPAMMessage(pamh, 'No USB devices connected!')
 
         btr = BluetoothRecognizer()
         auth_log('Recognizing Bluetooth devices ...')
-        setPAMMessage(pamh, 'Recognizing Bluetooth devices ...')
         device = btr.check()
         if device is not None:
-            auth_log('Device {} is connected'.format(device['id']))
             auth_log('Access granted!')
-            setPAMMessage(pamh, 'Device "{}" is connected (good).'.format(
-                device['name'].encode('utf-8')))
-            setPAMMessage(pamh, 'Access granted!')
             return pamh.PAM_SUCCESS
         auth_log('No Bluetooth devices connected!', syslog.LOG_WARNING)
-        setPAMMessage(pamh, 'No Bluetooth devices connected!')
 
-        setPAMMessage(pamh, 'Access denied!', True)
         return pamh.PAM_AUTH_ERR
 
     except UserUnknownException as e:
         auth_log(str(e), syslog.LOG_ERR)
-        setPAMMessage(pamh, 'Access denied!', True)
         return pamh.PAM_USER_UNKNOWN
 
     except Exception as e:
