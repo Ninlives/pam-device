@@ -35,7 +35,7 @@ DEVNULL = open(os.devnull, 'wb')
 def execute_command(command):
     return subprocess.Popen(command, shell=True,
                             stdout=subprocess.PIPE,
-                            stderr=DEVNULL).stdout.read().decode()
+                            stderr=DEVNULL).stdout.read().decode('utf8')
 
 
 class Recognizer(object):

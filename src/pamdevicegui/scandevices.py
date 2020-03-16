@@ -52,7 +52,7 @@ WAIT_CURSOR = Gdk.Cursor(Gdk.CursorType.WATCH)
 def execute_command(command):
     return subprocess.Popen(command, shell=True,
                             stdout=subprocess.PIPE,
-                            stderr=DEVNULL).stdout.read()
+                            stderr=DEVNULL).stdout.read().decode('utf8')
 
 
 class ScanDevicesDialog(Gtk.Dialog):
@@ -150,7 +150,7 @@ class ScanDevicesDialog(Gtk.Dialog):
     def scan_bluetooth(self):
         device_re = re.compile(r"^Device\s+([^\s]+)\s+(.*)$", re.I)
         devices = []
-        df = execute_command('bluetoothctl devices').decode()
+        df = execute_command('bluetoothctl devices')
         for i in df.split('\n'):
             if i:
                 info = device_re.match(i)
@@ -167,7 +167,7 @@ class ScanDevicesDialog(Gtk.Dialog):
         device_re = re.compile(r".*ID\s(?P<idVendor>\w+):(?P<idProduct>\w+)\s(?P<name>.+)$", re.I)
         serial_re = re.compile(r".*iSerial\s+(?P<iSerial>[^\s]+)\s", re.I)
         found = []
-        df = execute_command('lsusb').decode()
+        df = execute_command('lsusb')
         for i in df.split('\n'):
             if i:
                 info = device_re.match(i)
@@ -175,7 +175,7 @@ class ScanDevicesDialog(Gtk.Dialog):
                     dinfo = info.groupdict()
                     command = 'lsusb -vd {}:{}'.format(
                         dinfo['idVendor'], dinfo['idProduct'])
-                    ans = execute_command(command).decode().replace('\n', '')
+                    ans = execute_command(command).replace('\n', '')
                     data = serial_re.match(ans)
                     if data:
                         dserial = data.groupdict()
