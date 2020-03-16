@@ -46,7 +46,7 @@ class BluetoothRecognizer(Recognizer):
         return devices
 
     def is_device_connected(self, item_id):
-        connected_re = re.compile(r"Connected:\s+yes$", r.MULTILINE)
+        connected_re = re.compile(r"Connected:\s+yes$", re.MULTILINE)
         df = execute_command('bluetoothctl info {}'.format(item_id))
         if connected_re.search(df):
             return True
