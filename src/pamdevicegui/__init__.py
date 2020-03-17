@@ -16,7 +16,7 @@ if user == "root" or user is None:
 	else:
 		user = env_user
 
-CONFIG_DIR = os.path.join('var', 'lib', 'pam-device', user)
+CONFIG_DIR = os.path.join('/var', 'lib', 'pam-device', user)
 
 CONFIG_FILE = os.path.join(CONFIG_DIR, 'pam-device.json')
 PARAMS = {'usb': [],
